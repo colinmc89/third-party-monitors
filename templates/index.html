@@ -43,17 +43,17 @@
         }
         
         .integrations-bar {
-            background: white;
+            background: #2c3e50;
             border-radius: 8px;
             padding: 25px;
-            margin-bottom: 30px;
+            margin-top: 30px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .integrations-bar h2 {
             font-size: 1.3em;
             margin-bottom: 20px;
-            color: #2c3e50;
+            color: white;
         }
         
         .notification-form {
@@ -70,7 +70,7 @@
         
         .notification-section-title {
             font-weight: 600;
-            color: #2c3e50;
+            color: white;
             margin-bottom: 5px;
         }
         
@@ -82,35 +82,48 @@
         
         .notification-input-group label {
             font-size: 0.9em;
-            color: #495057;
+            color: #e9ecef;
             font-weight: 500;
         }
         
         .notification-input-group input,
         .notification-input-group select {
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid rgba(255,255,255,0.3);
             border-radius: 4px;
             font-size: 0.95em;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .notification-input-group input::placeholder {
+            color: rgba(255,255,255,0.5);
         }
         
         .notification-input-group input:focus,
         .notification-input-group select:focus {
             outline: none;
             border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.3);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .notification-input-group select option {
+            background: #2c3e50;
+            color: white;
         }
         
         .notification-toggle-group {
             display: flex;
             align-items: center;
             gap: 10px;
+            color: white;
         }
         
         .notification-type-group {
             grid-column: 1 / -1;
             padding-top: 15px;
-            border-top: 1px solid #dee2e6;
+            border-top: 1px solid rgba(255,255,255,0.2);
         }
         
         .save-button {
@@ -487,70 +500,8 @@
     </div>
     
     <div class="container">
-        <!-- Integration Controls -->
-        <div class="integrations-bar">
-            <h2>Notification Integrations</h2>
-            <form id="notification-form" class="notification-form">
-                <!-- Slack Section -->
-                <div class="notification-section">
-                    <div class="notification-section-title">Slack</div>
-                    <div class="notification-toggle-group">
-                        <span>Enabled</span>
-                        <div class="toggle-switch active" id="slack-toggle" data-integration="slack"></div>
-                    </div>
-                    <div class="notification-input-group">
-                        <label for="slack-channel">Channel or User</label>
-                        <input type="text" id="slack-channel" name="slack-channel" 
-                               placeholder="#alerts or @username" 
-                               value="{{ monitors[0].integrations.slack.channel_or_user if monitors and monitors[0].integrations.slack.channel_or_user else '' }}">
-                    </div>
-                </div>
-                
-                <!-- Email Section -->
-                <div class="notification-section">
-                    <div class="notification-section-title">Email</div>
-                    <div class="notification-toggle-group">
-                        <span>Enabled</span>
-                        <div class="toggle-switch active" id="email-toggle" data-integration="email"></div>
-                    </div>
-                    <div class="notification-input-group">
-                        <label for="email-address">Email Address</label>
-                        <input type="email" id="email-address" name="email-address" 
-                               placeholder="eng@minoan.com" 
-                               value="{{ monitors[0].integrations.email.recipients[0] if monitors and monitors[0].integrations.email.recipients else '' }}">
-                    </div>
-                </div>
-                
-                <!-- Notification Type -->
-                <div class="notification-type-group">
-                    <div class="notification-input-group">
-                        <label for="notification-type">Notification Type</label>
-                        <select id="notification-type" name="notification-type">
-                            <option value="all_errors" {% if monitors and monitors[0].integrations.notification_type == 'all_errors' %}selected{% endif %}>All Errors</option>
-                            <option value="daily_digest" {% if monitors and monitors[0].integrations.notification_type == 'daily_digest' %}selected{% endif %}>Daily Digest</option>
-                            <option value="none" {% if monitors and monitors[0].integrations.notification_type == 'none' %}selected{% endif %}>None</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="save-button">
-                    <button type="submit">Save Notification Settings</button>
-                </div>
-            </form>
-        </div>
-        
-        <!-- Monitor Header -->
+        <!-- Monitor Sections -->
         {% for monitor in monitors %}
-        <div class="monitor-header">
-            <div class="monitor-title">
-                <span class="status-indicator status-{{ monitor.status }}"></span>
-                <span class="monitor-name">{{ monitor.name }}</span>
-            </div>
-            <div style="color: #6c757d; font-size: 0.9em;">
-                {{ monitor.api_endpoint }} • Last checked: {{ monitor.last_check[:16] if monitor.last_check else 'Never' }}
-            </div>
-        </div>
-        
         <!-- Section 1: API Uptime -->
         <div class="monitoring-section-full">
             <div class="section-header-full">
@@ -823,6 +774,58 @@
             </div>
         </div>
         {% endfor %}
+        
+        <!-- Notification Integrations -->
+        <div class="integrations-bar">
+            <h2>Notification Integrations</h2>
+            <form id="notification-form" class="notification-form">
+                <!-- Slack Section -->
+                <div class="notification-section">
+                    <div class="notification-section-title">Slack</div>
+                    <div class="notification-toggle-group">
+                        <span>Enabled</span>
+                        <div class="toggle-switch active" id="slack-toggle" data-integration="slack"></div>
+                    </div>
+                    <div class="notification-input-group">
+                        <label for="slack-channel">Channel or User</label>
+                        <input type="text" id="slack-channel" name="slack-channel" 
+                               placeholder="#alerts or @username" 
+                               value="{{ monitors[0].integrations.slack.channel_or_user if monitors and monitors[0].integrations.slack.channel_or_user else '' }}">
+                    </div>
+                </div>
+                
+                <!-- Email Section -->
+                <div class="notification-section">
+                    <div class="notification-section-title">Email</div>
+                    <div class="notification-toggle-group">
+                        <span>Enabled</span>
+                        <div class="toggle-switch active" id="email-toggle" data-integration="email"></div>
+                    </div>
+                    <div class="notification-input-group">
+                        <label for="email-address">Email Address</label>
+                        <input type="email" id="email-address" name="email-address" 
+                               placeholder="eng@minoan.com" 
+                               value="{{ monitors[0].integrations.email.recipients[0] if monitors and monitors[0].integrations.email.recipients else '' }}">
+                    </div>
+                </div>
+                
+                <!-- Notification Type -->
+                <div class="notification-type-group">
+                    <div class="notification-input-group">
+                        <label for="notification-type">Notification Type</label>
+                        <select id="notification-type" name="notification-type">
+                            <option value="all_errors" {% if monitors and monitors[0].integrations.notification_type == 'all_errors' %}selected{% endif %}>All Errors</option>
+                            <option value="daily_digest" {% if monitors and monitors[0].integrations.notification_type == 'daily_digest' %}selected{% endif %}>Daily Digest</option>
+                            <option value="none" {% if monitors and monitors[0].integrations.notification_type == 'none' %}selected{% endif %}>None</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="save-button">
+                    <button type="submit">Save Notification Settings</button>
+                </div>
+            </form>
+        </div>
     </div>
     
     <script>
