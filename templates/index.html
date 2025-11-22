@@ -45,20 +45,78 @@
         .integrations-bar {
             background: white;
             border-radius: 8px;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 30px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .integrations-bar h2 {
             font-size: 1.3em;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: #2c3e50;
         }
         
-        .integration-toggles {
+        .notification-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        .notification-section {
             display: flex;
-            gap: 30px;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .notification-section-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .notification-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .notification-input-group label {
+            font-size: 0.9em;
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .notification-input-group input,
+        .notification-input-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+        
+        .notification-input-group input:focus,
+        .notification-input-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
+        }
+        
+        .notification-toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification-type-group {
+            grid-column: 1 / -1;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .save-button {
+            grid-column: 1 / -1;
+            justify-self: end;
+            margin-top: 10px;
         }
         
         .integration-item {
@@ -432,16 +490,53 @@
         <!-- Integration Controls -->
         <div class="integrations-bar">
             <h2>Notification Integrations</h2>
-            <div class="integration-toggles">
-                <div class="integration-item">
-                    <span>Slack</span>
-                    <div class="toggle-switch active" id="slack-toggle" data-integration="slack"></div>
+            <form id="notification-form" class="notification-form">
+                <!-- Slack Section -->
+                <div class="notification-section">
+                    <div class="notification-section-title">Slack</div>
+                    <div class="notification-toggle-group">
+                        <span>Enabled</span>
+                        <div class="toggle-switch active" id="slack-toggle" data-integration="slack"></div>
+                    </div>
+                    <div class="notification-input-group">
+                        <label for="slack-channel">Channel or User</label>
+                        <input type="text" id="slack-channel" name="slack-channel" 
+                               placeholder="#alerts or @username" 
+                               value="{{ monitors[0].integrations.slack.channel_or_user if monitors and monitors[0].integrations.slack.channel_or_user else '' }}">
+                    </div>
                 </div>
-                <div class="integration-item">
-                    <span>Email</span>
-                    <div class="toggle-switch active" id="email-toggle" data-integration="email"></div>
+                
+                <!-- Email Section -->
+                <div class="notification-section">
+                    <div class="notification-section-title">Email</div>
+                    <div class="notification-toggle-group">
+                        <span>Enabled</span>
+                        <div class="toggle-switch active" id="email-toggle" data-integration="email"></div>
+                    </div>
+                    <div class="notification-input-group">
+                        <label for="email-address">Email Address</label>
+                        <input type="email" id="email-address" name="email-address" 
+                               placeholder="eng@minoan.com" 
+                               value="{{ monitors[0].integrations.email.recipients[0] if monitors and monitors[0].integrations.email.recipients else '' }}">
+                    </div>
                 </div>
-            </div>
+                
+                <!-- Notification Type -->
+                <div class="notification-type-group">
+                    <div class="notification-input-group">
+                        <label for="notification-type">Notification Type</label>
+                        <select id="notification-type" name="notification-type">
+                            <option value="all_errors" {% if monitors and monitors[0].integrations.notification_type == 'all_errors' %}selected{% endif %}>All Errors</option>
+                            <option value="daily_digest" {% if monitors and monitors[0].integrations.notification_type == 'daily_digest' %}selected{% endif %}>Daily Digest</option>
+                            <option value="none" {% if monitors and monitors[0].integrations.notification_type == 'none' %}selected{% endif %}>None</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="save-button">
+                    <button type="submit">Save Notification Settings</button>
+                </div>
+            </form>
         </div>
         
         <!-- Monitor Header -->
@@ -739,19 +834,57 @@
                 
                 this.classList.toggle('active');
                 
-                try {
-                    await fetch('/api/integrations', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            [integration]: { enabled: !isActive }
-                        })
-                    });
-                } catch (error) {
-                    console.error('Error updating integration:', error);
-                    this.classList.toggle('active'); // Revert on error
-                }
+                // Don't save on toggle click - wait for form submit
             });
+        });
+        
+        // Notification form submission
+        document.getElementById('notification-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const slackEnabled = document.getElementById('slack-toggle').classList.contains('active');
+            const emailEnabled = document.getElementById('email-toggle').classList.contains('active');
+            const slackChannel = document.getElementById('slack-channel').value.trim();
+            const emailAddress = document.getElementById('email-address').value.trim();
+            const notificationType = document.getElementById('notification-type').value;
+            
+            const payload = {
+                slack: {
+                    enabled: slackEnabled,
+                    channel_or_user: slackChannel
+                },
+                email: {
+                    enabled: emailEnabled,
+                    recipients: emailAddress ? [emailAddress] : []
+                },
+                notification_type: notificationType
+            };
+            
+            try {
+                const response = await fetch('/api/integrations', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    // Show success feedback
+                    const button = document.querySelector('#notification-form button[type="submit"]');
+                    const originalText = button.textContent;
+                    button.textContent = '✓ Saved!';
+                    button.style.background = '#28a745';
+                    
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = '';
+                    }, 2000);
+                } else {
+                    alert('Error saving notification settings');
+                }
+            } catch (error) {
+                console.error('Error updating integrations:', error);
+                alert('Error saving notification settings');
+            }
         });
         
         // Monitoring feature toggles

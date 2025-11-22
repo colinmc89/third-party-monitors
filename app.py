@@ -59,12 +59,14 @@ MONITORS: List[Dict[str, Any]] = [
         "integrations": {
             "slack": {
                 "enabled": True,
-                "webhook_url": "https://hooks.slack.com/services/..."
+                "webhook_url": "https://hooks.slack.com/services/...",
+                "channel_or_user": "#alerts"
             },
             "email": {
                 "enabled": True,
                 "recipients": ["eng@minoan.com", "ops@minoan.com"]
-            }
+            },
+            "notification_type": "all_errors"  # all_errors, daily_digest, none
         },
         "created_at": (datetime.now() - timedelta(days=7)).isoformat()
     }
@@ -171,7 +173,8 @@ def create_monitor():
             "email": {
                 "enabled": data.get("email_enabled", True),
                 "recipients": data.get("email_recipients", [])
-            }
+            },
+            "notification_type": data.get("notification_type", "all_errors")
         },
         "created_at": datetime.now().isoformat()
     }
@@ -248,9 +251,17 @@ def update_integrations():
     # Update all monitors' integration settings
     for monitor in MONITORS:
         if "slack" in data:
-            monitor["integrations"]["slack"]["enabled"] = data["slack"].get("enabled", False)
+            if "enabled" in data["slack"]:
+                monitor["integrations"]["slack"]["enabled"] = data["slack"]["enabled"]
+            if "channel_or_user" in data["slack"]:
+                monitor["integrations"]["slack"]["channel_or_user"] = data["slack"]["channel_or_user"]
         if "email" in data:
-            monitor["integrations"]["email"]["enabled"] = data["email"].get("enabled", False)
+            if "enabled" in data["email"]:
+                monitor["integrations"]["email"]["enabled"] = data["email"]["enabled"]
+            if "recipients" in data["email"]:
+                monitor["integrations"]["email"]["recipients"] = data["email"]["recipients"]
+        if "notification_type" in data:
+            monitor["integrations"]["notification_type"] = data["notification_type"]
     
     return jsonify({"message": "Integrations updated"})
 
