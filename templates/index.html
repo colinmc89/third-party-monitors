@@ -37,8 +37,9 @@
         }
         
         .header-logo {
-            height: 50px;
-            width: auto;
+            height: 60px;
+            width: 60px;
+            border-radius: 4px;
         }
         
         .header-right {
@@ -523,9 +524,11 @@
                     <p class="subtitle">Reliability Layer for External Data Sources</p>
                 </div>
                 <div class="header-right">
-                    <svg class="header-logo" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="200" height="60" fill="#1a5f7a"/>
-                        <text x="100" y="40" font-family="serif" font-size="32" font-weight="normal" fill="white" text-anchor="middle">Minoan</text>
+                    <!-- If you have the actual logo file, replace this SVG with: <img src="{{ url_for('static', filename='minoan-logo.png') }}" alt="Minoan Tech Logo" class="header-logo"> -->
+                    <svg class="header-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="200" height="200" fill="#1a5f7a"/>
+                        <text x="100" y="90" font-family="Georgia, serif" font-size="48" font-weight="normal" fill="white" text-anchor="middle">Minoan</text>
+                        <text x="100" y="140" font-family="Arial, sans-serif" font-size="36" font-weight="normal" fill="white" text-anchor="middle">Tech</text>
                     </svg>
                 </div>
             </div>
