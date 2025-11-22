@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Third Party Monitors - Reliability Layer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid #dee2e6;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        h1 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+        
+        .integrations-bar {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .integrations-bar h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .integration-toggles {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .integration-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #ccc;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #28a745;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            top: 3px;
+            left: 3px;
+            transition: left 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            left: 27px;
+        }
+        
+        .monitor-header {
+            background: white;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .monitor-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .monitor-name {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-healthy {
+            background: #28a745;
+        }
+        
+        .status-warning {
+            background: #ffc107;
+        }
+        
+        .status-critical {
+            background: #dc3545;
+        }
+        
+        .monitoring-section-full {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section-header-full {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .section-title-full {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .section-subtitle {
+            font-size: 1em;
+            color: #6c757d;
+            font-weight: normal;
+        }
+        
+        .section-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .section-config {
+            border-right: 1px solid #dee2e6;
+            padding-right: 30px;
+        }
+        
+        .section-history {
+            padding-left: 30px;
+        }
+        
+        .config-item {
+            margin-bottom: 15px;
+        }
+        
+        .config-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .config-value {
+            color: #6c757d;
+            font-size: 0.95em;
+        }
+        
+        .config-list {
+            margin-top: 5px;
+            margin-left: 20px;
+        }
+        
+        .config-list li {
+            margin-bottom: 3px;
+        }
+        
+        .last-error {
+            background: #fff5f5;
+            border-left: 4px solid #dc3545;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .last-error.warning {
+            background: #fffbf0;
+            border-left-color: #ffc107;
+        }
+        
+        .last-error-title {
+            font-weight: 600;
+            color: #dc3545;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .last-error.warning .last-error-title {
+            color: #856404;
+        }
+        
+        .last-error-message {
+            color: #6c757d;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+        
+        .last-error-time {
+            font-size: 0.85em;
+            color: #adb5bd;
+        }
+        
+        .no-error {
+            background: #f0f9ff;
+            border-left: 4px solid #28a745;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            color: #155724;
+            text-align: center;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .history-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 12px;
+            border-left: 3px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+        
+        .history-item.critical {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        
+        .history-item.warning {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+        
+        .history-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+        
+        .history-item-message {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .history-item-time {
+            font-size: 0.75em;
+            color: #adb5bd;
+        }
+        
+        .empty-history {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toggle-label {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        button.secondary {
+            background: #6c757d;
+        }
+        
+        button.secondary:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>Third Party Monitors</h1>
+            <p class="subtitle">Reliability Layer for External Data Sources</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Integration Controls -->
+        <div class="integrations-bar">
+            <h2>Notification Integrations</h2>
+            <div class="integration-toggles">
+                <div class="integration-item">
+                    <span>Slack</span>
+                    <div class="toggle-switch active" id="slack-toggle" data-integration="slack"></div>
+                </div>
+                <div class="integration-item">
+                    <span>Email</span>
+                    <div class="toggle-switch active" id="email-toggle" data-integration="email"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Monitor Header -->
+        {% for monitor in monitors %}
+        <div class="monitor-header">
+            <div class="monitor-title">
+                <span class="status-indicator status-{{ monitor.status }}"></span>
+                <span class="monitor-name">{{ monitor.name }}</span>
+            </div>
+            <div style="color: #6c757d; font-size: 0.9em;">
+                {{ monitor.api_endpoint }} • Last checked: {{ monitor.last_check[:16] if monitor.last_check else 'Never' }}
+            </div>
+        </div>
+        
+        <!-- Section 1: API Unresponsive Alerts -->
+        <div class="monitoring-section-full">
+            <div class="section-header-full">
+                <div>
+                    <div class="section-title-full">1. API Unresponsive Alerts</div>
+                    <div class="section-subtitle">Availability Monitoring</div>
+                </div>
+                <div class="toggle-container">
+                    <span class="toggle-label">Enabled</span>
+                    <div class="toggle-switch {% if monitor.availability_monitoring.enabled %}active{% endif %}" 
+                         data-monitor="{{ monitor.id }}" 
+                         data-feature="availability"></div>
+                </div>
+            </div>
+            
+            <div class="section-content">
+                <div class="section-config">
+                    <div class="config-item">
+                        <span class="config-label">Threshold</span>
+                        <div class="config-value">{{ monitor.availability_monitoring.threshold_minutes }} minutes of unresponsiveness</div>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Notification Channels</span>
+                        <div class="config-value">
+                            {% if monitor.integrations.slack.enabled %}Slack{% endif %}
+                            {% if monitor.integrations.slack.enabled and monitor.integrations.email.enabled %}, {% endif %}
+                            {% if monitor.integrations.email.enabled %}Email{% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if monitor.availability_monitoring.last_incident %}
+                    <div class="last-error critical">
+                        <div class="last-error-title">
+                            <span>⚠️</span>
+                            <span>Last Error</span>
+                        </div>
+                        <div class="last-error-message">{{ monitor.availability_monitoring.last_incident.message }}</div>
+                        <div class="last-error-time">{{ monitor.availability_monitoring.last_incident.timestamp[:16] if monitor.availability_monitoring.last_incident.timestamp else '' }}</div>
+                    </div>
+                    {% else %}
+                    <div class="no-error">
+                        ✓ No errors detected
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="section-history">
+                    <div class="history-header">
+                        <div class="history-title">History</div>
+                        <button onclick="createTestAlert('availability')">Test Alert</button>
+                    </div>
+                    <div class="history-list">
+                        {% if monitor.availability_monitoring.history %}
+                            {% for alert in monitor.availability_monitoring.history[:10] %}
+                            <div class="history-item {{ alert.severity }}">
+                                <div class="history-item-title">{{ alert.title }}</div>
+                                <div class="history-item-message">{{ alert.message }}</div>
+                                <div class="history-item-time">{{ alert.timestamp[:16] if alert.timestamp else '' }}</div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-history">No alerts in history</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 2: API Acting Weird Alerts -->
+        <div class="monitoring-section-full">
+            <div class="section-header-full">
+                <div>
+                    <div class="section-title-full">2. API Acting Weird Alerts</div>
+                    <div class="section-subtitle">Data Quality Monitoring</div>
+                </div>
+                <div class="toggle-container">
+                    <span class="toggle-label">Enabled</span>
+                    <div class="toggle-switch {% if monitor.data_quality_monitoring.enabled %}active{% endif %}" 
+                         data-monitor="{{ monitor.id }}" 
+                         data-feature="data_quality"></div>
+                </div>
+            </div>
+            
+            <div class="section-content">
+                <div class="section-config">
+                    <div class="config-item">
+                        <span class="config-label">Null Threshold</span>
+                        <div class="config-value">{{ monitor.data_quality_monitoring.null_threshold_percent }}%</div>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Current Null Rate</span>
+                        <div class="config-value">{{ monitor.data_quality_monitoring.current_null_rate }}%</div>
+                    </div>
+                    <div class="config-item">
+                        <span class="config-label">Fields Monitored</span>
+                        <ul class="config-list">
+                            {% for field in monitor.data_quality_monitoring.fields_monitored %}
+                            <li>{{ field }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    {% set last_data_quality_error = monitor.data_quality_monitoring.history[0] if monitor.data_quality_monitoring.history else None %}
+                    {% if last_data_quality_error %}
+                    <div class="last-error warning">
+                        <div class="last-error-title">
+                            <span>⚠️</span>
+                            <span>Last Error</span>
+                        </div>
+                        <div class="last-error-message">{{ last_data_quality_error.message }}</div>
+                        <div class="last-error-time">{{ last_data_quality_error.timestamp[:16] if last_data_quality_error.timestamp else '' }}</div>
+                    </div>
+                    {% else %}
+                    <div class="no-error">
+                        ✓ No errors detected
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="section-history">
+                    <div class="history-header">
+                        <div class="history-title">History</div>
+                        <button onclick="createTestAlert('data_quality')">Test Alert</button>
+                    </div>
+                    <div class="history-list">
+                        {% if monitor.data_quality_monitoring.history %}
+                            {% for alert in monitor.data_quality_monitoring.history[:10] %}
+                            <div class="history-item {{ alert.severity }}">
+                                <div class="history-item-title">{{ alert.title }}</div>
+                                <div class="history-item-message">{{ alert.message }}</div>
+                                <div class="history-item-time">{{ alert.timestamp[:16] if alert.timestamp else '' }}</div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-history">No alerts in history</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 3: Data Looks Wrong Alerts -->
+        <div class="monitoring-section-full">
+            <div class="section-header-full">
+                <div>
+                    <div class="section-title-full">3. Data Looks Wrong Alerts</div>
+                    <div class="section-subtitle">Anomaly Detection</div>
+                </div>
+                <div class="toggle-container">
+                    <span class="toggle-label">Enabled</span>
+                    <div class="toggle-switch {% if monitor.anomaly_detection.enabled %}active{% endif %}" 
+                         data-monitor="{{ monitor.id }}" 
+                         data-feature="anomaly"></div>
+                </div>
+            </div>
+            
+            <div class="section-content">
+                <div class="section-config">
+                    <div class="config-item">
+                        <span class="config-label">Anomaly Checks Enabled</span>
+                        <ul class="config-list">
+                            {% for check in monitor.anomaly_detection.checks %}
+                            <li>{{ check.replace('_', ' ').title() }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    {% set last_anomaly_error = monitor.anomaly_detection.history[0] if monitor.anomaly_detection.history else None %}
+                    {% if last_anomaly_error %}
+                    <div class="last-error warning">
+                        <div class="last-error-title">
+                            <span>⚠️</span>
+                            <span>Last Error</span>
+                        </div>
+                        <div class="last-error-message">{{ last_anomaly_error.message }}</div>
+                        <div class="last-error-time">{{ last_anomaly_error.timestamp[:16] if last_anomaly_error.timestamp else '' }}</div>
+                    </div>
+                    {% else %}
+                    <div class="no-error">
+                        ✓ No errors detected
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="section-history">
+                    <div class="history-header">
+                        <div class="history-title">History</div>
+                        <button onclick="createTestAlert('anomaly')">Test Alert</button>
+                    </div>
+                    <div class="history-list">
+                        {% if monitor.anomaly_detection.history %}
+                            {% for alert in monitor.anomaly_detection.history[:10] %}
+                            <div class="history-item {{ alert.severity }}">
+                                <div class="history-item-title">{{ alert.title }}</div>
+                                <div class="history-item-message">{{ alert.message }}</div>
+                                <div class="history-item-time">{{ alert.timestamp[:16] if alert.timestamp else '' }}</div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-history">No alerts in history</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <script>
+        // Integration toggles
+        document.querySelectorAll('#slack-toggle, #email-toggle').forEach(toggle => {
+            toggle.addEventListener('click', async function() {
+                const integration = this.dataset.integration;
+                const isActive = this.classList.contains('active');
+                
+                this.classList.toggle('active');
+                
+                try {
+                    await fetch('/api/integrations', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            [integration]: { enabled: !isActive }
+                        })
+                    });
+                } catch (error) {
+                    console.error('Error updating integration:', error);
+                    this.classList.toggle('active'); // Revert on error
+                }
+            });
+        });
+        
+        // Monitoring feature toggles
+        document.querySelectorAll('[data-feature]').forEach(toggle => {
+            toggle.addEventListener('click', async function() {
+                const monitorId = parseInt(this.dataset.monitor);
+                const feature = this.dataset.feature;
+                const isActive = this.classList.contains('active');
+                
+                this.classList.toggle('active');
+                
+                const featureKey = feature === 'availability' ? 'availability_monitoring' :
+                                  feature === 'data_quality' ? 'data_quality_monitoring' :
+                                  'anomaly_detection';
+                
+                try {
+                    await fetch(`/api/monitors/${monitorId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            [featureKey]: { enabled: !isActive }
+                        })
+                    });
+                } catch (error) {
+                    console.error('Error updating monitor:', error);
+                    this.classList.toggle('active'); // Revert on error
+                }
+            });
+        });
+        
+        // Test alert generation
+        async function createTestAlert(type) {
+            try {
+                const url = type ? `/api/alerts/test?type=${type}` : '/api/alerts/test';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Error creating test alert:', error);
+            }
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
