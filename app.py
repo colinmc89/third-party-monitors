@@ -17,14 +17,26 @@ MONITORS: List[Dict[str, Any]] = [
             "enabled": True,
             "threshold_minutes": 5,
             "last_incident": None,
-            "history": []
+            "history": [],
+            "third_parties": [
+                {"name": "Wayfair", "status": "healthy", "last_check": (datetime.now() - timedelta(minutes=2)).isoformat()},
+                {"name": "Amazon", "status": "healthy", "last_check": (datetime.now() - timedelta(minutes=1)).isoformat()},
+                {"name": "Crate", "status": "warning", "last_check": (datetime.now() - timedelta(minutes=6)).isoformat()},
+                {"name": "Shopify", "status": "healthy", "last_check": (datetime.now() - timedelta(minutes=3)).isoformat()}
+            ]
         },
         "data_quality_monitoring": {
             "enabled": True,
             "null_threshold_percent": 10,
             "fields_monitored": ["price", "inventory", "shipping_fee", "edd"],
             "current_null_rate": 2.3,
-            "history": []
+            "history": [],
+            "third_parties": [
+                {"name": "Wayfair", "status": "warning", "null_rate": 12.5, "last_check": (datetime.now() - timedelta(minutes=2)).isoformat()},
+                {"name": "Amazon", "status": "healthy", "null_rate": 1.2, "last_check": (datetime.now() - timedelta(minutes=1)).isoformat()},
+                {"name": "Crate", "status": "healthy", "null_rate": 3.8, "last_check": (datetime.now() - timedelta(minutes=4)).isoformat()},
+                {"name": "Shopify", "status": "healthy", "null_rate": 2.1, "last_check": (datetime.now() - timedelta(minutes=3)).isoformat()}
+            ]
         },
         "anomaly_detection": {
             "enabled": True,
@@ -36,7 +48,13 @@ MONITORS: List[Dict[str, Any]] = [
                 "shipping_fluctuations"
             ],
             "recent_anomalies": [],
-            "history": []
+            "history": [],
+            "third_parties": [
+                {"name": "Wayfair", "status": "healthy", "anomalies_count": 0, "last_check": (datetime.now() - timedelta(minutes=2)).isoformat()},
+                {"name": "Amazon", "status": "warning", "anomalies_count": 3, "last_check": (datetime.now() - timedelta(minutes=1)).isoformat()},
+                {"name": "Crate", "status": "healthy", "anomalies_count": 0, "last_check": (datetime.now() - timedelta(minutes=5)).isoformat()},
+                {"name": "Shopify", "status": "healthy", "anomalies_count": 1, "last_check": (datetime.now() - timedelta(minutes=3)).isoformat()}
+            ]
         },
         "integrations": {
             "slack": {
@@ -121,14 +139,16 @@ def create_monitor():
             "enabled": data.get("availability_enabled", True),
             "threshold_minutes": data.get("threshold_minutes", 5),
             "last_incident": None,
-            "history": []
+            "history": [],
+            "third_parties": []
         },
         "data_quality_monitoring": {
             "enabled": data.get("data_quality_enabled", True),
             "null_threshold_percent": data.get("null_threshold_percent", 10),
             "fields_monitored": data.get("fields_monitored", ["price", "inventory", "shipping_fee", "edd"]),
             "current_null_rate": 0.0,
-            "history": []
+            "history": [],
+            "third_parties": []
         },
         "anomaly_detection": {
             "enabled": data.get("anomaly_enabled", True),
@@ -140,7 +160,8 @@ def create_monitor():
                 "shipping_fluctuations"
             ]),
             "recent_anomalies": [],
-            "history": []
+            "history": [],
+            "third_parties": []
         },
         "integrations": {
             "slack": {

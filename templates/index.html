@@ -253,6 +253,79 @@
             text-align: center;
         }
         
+        .third-parties-list {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .third-parties-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1em;
+        }
+        
+        .third-party-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #dee2e6;
+        }
+        
+        .third-party-item.healthy {
+            border-left-color: #28a745;
+        }
+        
+        .third-party-item.warning {
+            border-left-color: #ffc107;
+        }
+        
+        .third-party-item.critical {
+            border-left-color: #dc3545;
+        }
+        
+        .third-party-name {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .third-party-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+        }
+        
+        .third-party-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .third-party-status-dot.healthy {
+            background: #28a745;
+        }
+        
+        .third-party-status-dot.warning {
+            background: #ffc107;
+        }
+        
+        .third-party-status-dot.critical {
+            background: #dc3545;
+        }
+        
+        .third-party-meta {
+            font-size: 0.75em;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+        
         .history-header {
             display: flex;
             justify-content: space-between;
@@ -413,6 +486,26 @@
                         </div>
                     </div>
                     
+                    <div class="third-parties-list">
+                        <div class="third-parties-title">Third Parties</div>
+                        {% if monitor.availability_monitoring.third_parties %}
+                            {% for party in monitor.availability_monitoring.third_parties %}
+                            <div class="third-party-item {{ party.status }}">
+                                <div>
+                                    <div class="third-party-name">{{ party.name }}</div>
+                                    <div class="third-party-meta">Last check: {{ party.last_check[:16] if party.last_check else 'Never' }}</div>
+                                </div>
+                                <div class="third-party-status">
+                                    <span class="third-party-status-dot {{ party.status }}"></span>
+                                    <span>{{ party.status|title }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-history">No third parties configured</div>
+                        {% endif %}
+                    </div>
+                    
                     {% if monitor.availability_monitoring.last_incident %}
                     <div class="last-error critical">
                         <div class="last-error-title">
@@ -485,6 +578,29 @@
                         </ul>
                     </div>
                     
+                    <div class="third-parties-list">
+                        <div class="third-parties-title">Third Parties</div>
+                        {% if monitor.data_quality_monitoring.third_parties %}
+                            {% for party in monitor.data_quality_monitoring.third_parties %}
+                            <div class="third-party-item {{ party.status }}">
+                                <div>
+                                    <div class="third-party-name">{{ party.name }}</div>
+                                    <div class="third-party-meta">
+                                        Null rate: {{ party.null_rate }}% • 
+                                        Last check: {{ party.last_check[:16] if party.last_check else 'Never' }}
+                                    </div>
+                                </div>
+                                <div class="third-party-status">
+                                    <span class="third-party-status-dot {{ party.status }}"></span>
+                                    <span>{{ party.status|title }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-history">No third parties configured</div>
+                        {% endif %}
+                    </div>
+                    
                     {% set last_data_quality_error = monitor.data_quality_monitoring.history[0] if monitor.data_quality_monitoring.history else None %}
                     {% if last_data_quality_error %}
                     <div class="last-error warning">
@@ -548,6 +664,29 @@
                             <li>{{ check.replace('_', ' ').title() }}</li>
                             {% endfor %}
                         </ul>
+                    </div>
+                    
+                    <div class="third-parties-list">
+                        <div class="third-parties-title">Third Parties</div>
+                        {% if monitor.anomaly_detection.third_parties %}
+                            {% for party in monitor.anomaly_detection.third_parties %}
+                            <div class="third-party-item {{ party.status }}">
+                                <div>
+                                    <div class="third-party-name">{{ party.name }}</div>
+                                    <div class="third-party-meta">
+                                        Anomalies: {{ party.anomalies_count }} • 
+                                        Last check: {{ party.last_check[:16] if party.last_check else 'Never' }}
+                                    </div>
+                                </div>
+                                <div class="third-party-status">
+                                    <span class="third-party-status-dot {{ party.status }}"></span>
+                                    <span>{{ party.status|title }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-history">No third parties configured</div>
+                        {% endif %}
                     </div>
                     
                     {% set last_anomaly_error = monitor.anomaly_detection.history[0] if monitor.anomaly_detection.history else None %}
