@@ -13,16 +13,37 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f8f9fa;
-            color: #212529;
+            background: #1a1d24;
+            color: #e9ecef;
             line-height: 1.6;
         }
         
         .header {
-            background: white;
-            border-bottom: 1px solid #dee2e6;
+            background: #2c3e50;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             padding: 20px 0;
             margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            flex: 1;
+        }
+        
+        .header-logo {
+            height: 50px;
+            width: auto;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
         }
         
         .container {
@@ -33,12 +54,12 @@
         
         h1 {
             font-size: 2em;
-            color: #2c3e50;
+            color: white;
             margin-bottom: 10px;
         }
         
         .subtitle {
-            color: #6c757d;
+            color: rgba(255,255,255,0.7);
             font-size: 1.1em;
         }
         
@@ -208,11 +229,11 @@
         }
         
         .monitoring-section-full {
-            background: white;
+            background: #2c3e50;
             border-radius: 8px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         
         .section-header-full {
@@ -221,19 +242,19 @@
             align-items: center;
             margin-bottom: 25px;
             padding-bottom: 20px;
-            border-bottom: 2px solid #dee2e6;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
         }
         
         .section-title-full {
             font-size: 1.5em;
             font-weight: 600;
-            color: #2c3e50;
+            color: white;
             margin-bottom: 5px;
         }
         
         .section-subtitle {
             font-size: 1em;
-            color: #6c757d;
+            color: rgba(255,255,255,0.7);
             font-weight: normal;
         }
         
@@ -244,7 +265,7 @@
         }
         
         .section-config {
-            border-right: 1px solid #dee2e6;
+            border-right: 1px solid rgba(255,255,255,0.2);
             padding-right: 30px;
         }
         
@@ -258,13 +279,13 @@
         
         .config-label {
             font-weight: 600;
-            color: #495057;
+            color: rgba(255,255,255,0.9);
             margin-bottom: 5px;
             display: block;
         }
         
         .config-value {
-            color: #6c757d;
+            color: rgba(255,255,255,0.7);
             font-size: 0.95em;
         }
         
@@ -278,7 +299,7 @@
         }
         
         .last-error {
-            background: #fff5f5;
+            background: rgba(220, 53, 69, 0.15);
             border-left: 4px solid #dc3545;
             border-radius: 4px;
             padding: 15px;
@@ -286,13 +307,13 @@
         }
         
         .last-error.warning {
-            background: #fffbf0;
+            background: rgba(255, 193, 7, 0.15);
             border-left-color: #ffc107;
         }
         
         .last-error-title {
             font-weight: 600;
-            color: #dc3545;
+            color: #ff6b6b;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
@@ -300,39 +321,39 @@
         }
         
         .last-error.warning .last-error-title {
-            color: #856404;
+            color: #ffd93d;
         }
         
         .last-error-message {
-            color: #6c757d;
+            color: rgba(255,255,255,0.8);
             font-size: 0.95em;
             margin-bottom: 5px;
         }
         
         .last-error-time {
             font-size: 0.85em;
-            color: #adb5bd;
+            color: rgba(255,255,255,0.5);
         }
         
         .no-error {
-            background: #f0f9ff;
+            background: rgba(40, 167, 69, 0.15);
             border-left: 4px solid #28a745;
             border-radius: 4px;
             padding: 15px;
             margin-top: 20px;
-            color: #155724;
+            color: #90ee90;
             text-align: center;
         }
         
         .third-parties-list {
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid #dee2e6;
+            border-top: 1px solid rgba(255,255,255,0.2);
         }
         
         .third-parties-title {
             font-weight: 600;
-            color: #2c3e50;
+            color: white;
             margin-bottom: 15px;
             font-size: 1em;
         }
@@ -343,9 +364,9 @@
             align-items: center;
             padding: 10px;
             margin-bottom: 8px;
-            background: #f8f9fa;
+            background: rgba(255,255,255,0.05);
             border-radius: 4px;
-            border-left: 3px solid #dee2e6;
+            border-left: 3px solid rgba(255,255,255,0.2);
         }
         
         .third-party-item.healthy {
@@ -362,7 +383,7 @@
         
         .third-party-name {
             font-weight: 500;
-            color: #2c3e50;
+            color: white;
         }
         
         .third-party-status {
@@ -370,6 +391,7 @@
             align-items: center;
             gap: 8px;
             font-size: 0.85em;
+            color: rgba(255,255,255,0.8);
         }
         
         .third-party-status-dot {
@@ -393,7 +415,7 @@
         
         .third-party-meta {
             font-size: 0.75em;
-            color: #6c757d;
+            color: rgba(255,255,255,0.6);
             margin-top: 2px;
         }
         
@@ -406,7 +428,7 @@
         
         .history-title {
             font-weight: 600;
-            color: #2c3e50;
+            color: white;
         }
         
         .history-list {
@@ -416,43 +438,44 @@
         
         .history-item {
             padding: 12px;
-            border-left: 3px solid #dee2e6;
+            border-left: 3px solid rgba(255,255,255,0.2);
             border-radius: 4px;
             margin-bottom: 10px;
-            background: #f8f9fa;
+            background: rgba(255,255,255,0.05);
         }
         
         .history-item.critical {
             border-left-color: #dc3545;
-            background: #fff5f5;
+            background: rgba(220, 53, 69, 0.15);
         }
         
         .history-item.warning {
             border-left-color: #ffc107;
-            background: #fffbf0;
+            background: rgba(255, 193, 7, 0.15);
         }
         
         .history-item-title {
             font-weight: 600;
             margin-bottom: 5px;
             font-size: 0.95em;
+            color: white;
         }
         
         .history-item-message {
             font-size: 0.85em;
-            color: #6c757d;
+            color: rgba(255,255,255,0.7);
             margin-bottom: 5px;
         }
         
         .history-item-time {
             font-size: 0.75em;
-            color: #adb5bd;
+            color: rgba(255,255,255,0.5);
         }
         
         .empty-history {
             text-align: center;
             padding: 30px;
-            color: #6c757d;
+            color: rgba(255,255,255,0.5);
             font-style: italic;
         }
         
@@ -464,7 +487,7 @@
         
         .toggle-label {
             font-size: 0.9em;
-            color: #6c757d;
+            color: rgba(255,255,255,0.8);
         }
         
         button {
@@ -494,8 +517,18 @@
 <body>
     <div class="header">
         <div class="container">
-            <h1>Third Party Monitors</h1>
-            <p class="subtitle">Reliability Layer for External Data Sources</p>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>Third Party Monitors</h1>
+                    <p class="subtitle">Reliability Layer for External Data Sources</p>
+                </div>
+                <div class="header-right">
+                    <svg class="header-logo" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="200" height="60" fill="#1a5f7a"/>
+                        <text x="100" y="40" font-family="serif" font-size="32" font-weight="normal" fill="white" text-anchor="middle">Minoan</text>
+                    </svg>
+                </div>
+            </div>
         </div>
     </div>
     
